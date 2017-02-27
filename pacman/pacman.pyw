@@ -14,6 +14,7 @@
 # - Added a high-score list. Depends on wx for querying the user's name
 
 import pygame, sys, os, random
+import ai
 from pygame.locals import *
 
 # WIN???
@@ -1329,22 +1330,23 @@ def CheckIfCloseButton(events):
 def CheckInputs(): 
     
     if thisGame.mode == 1:
-        if pygame.key.get_pressed()[ pygame.K_RIGHT ] or (js!=None and js.get_axis(JS_XAXIS)>0):
+        next_move = player_ai.next_move()
+        if next_move == player_ai.Right:
             if not thisLevel.CheckIfHitWall((player.x + player.speed, player.y), (player.nearestRow, player.nearestCol)): 
                 player.velX = player.speed
                 player.velY = 0
                 
-        elif pygame.key.get_pressed()[ pygame.K_LEFT ] or (js!=None and js.get_axis(JS_XAXIS)<0):
+        elif next_move == player_ai.Left:
             if not thisLevel.CheckIfHitWall((player.x - player.speed, player.y), (player.nearestRow, player.nearestCol)): 
                 player.velX = -player.speed
                 player.velY = 0
             
-        elif pygame.key.get_pressed()[ pygame.K_DOWN ] or (js!=None and js.get_axis(JS_YAXIS)>0):
+        elif next_move == player_ai.Down:
             if not thisLevel.CheckIfHitWall((player.x, player.y + player.speed), (player.nearestRow, player.nearestCol)): 
                 player.velX = 0
                 player.velY = player.speed
             
-        elif pygame.key.get_pressed()[ pygame.K_UP ] or (js!=None and js.get_axis(JS_YAXIS)<0):
+        elif next_move == player_ai.Up:
             if not thisLevel.CheckIfHitWall((player.x, player.y - player.speed), (player.nearestRow, player.nearestCol)):
                 player.velX = 0
                 player.velY = -player.speed
@@ -1447,6 +1449,9 @@ tileIDImage = {} # gives tile image (when the ID# is known)
 thisGame = game()
 thisLevel = level()
 thisLevel.LoadLevel( thisGame.GetLevelNum() )
+
+# create AI object
+player_ai = ai.AI(player, ghosts, thisGame, thisFruit, thisLevel)
 
 print thisGame.screenSize
 window = pygame.display.set_mode( thisGame.screenSize, pygame.DOUBLEBUF | pygame.HWSURFACE )
